@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<title>Chatアプリ</title>
+<link rel="stylesheet" href="js/css/style.css">
+</head>
+<body>
+
+<!-- コンテンツ表示画面 -->
+<dl id="balloon_l">
+            <dt id="faceicon"></dt>
+            <dd id="output"></dd>
+</dl>
+
+<div class="icon">
+    <ul>
+     <li class="imgs" data-img="0"><img src="imgs/buke.png" width="50"></li>
+     <li class="imgs" data-img="1"><img src="imgs/tuku.jpg" width="50"></li>
+     <li class="imgs" data-img="2"><img src="imgs/caram.png" width="50"></li>
+    </ul>
+</div>
+
+
+<div>
+    <div>名前：<input type="text" id="uname" size="35"></div>
+    <div>
+        <textarea  id="text" cols="20" rows="10"></textarea>
+        <button id="send">送信</button>
+    </div>
+    <div class="balloon1-left">
+  
+     <!-- <div id="output"></div> -->
+ </div>
+</div>
+
+
+
+
+<!--/ コンテンツ表示画面 -->
+
+
+
+<!-- JQuery -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+<!-- JQuery -->
+
+
+<!--** 以下Firebase **-->
+<!-- The core Firebase JS SDK is always required and must be listed first -->
+<script src="https://www.gstatic.com/firebasejs/7.20.0/firebase.js"></script>
+
+<!-- TODO: Add SDKs for Firebase products that you want to use
+     https://firebase.google.com/docs/web/setup#available-libraries -->
+
+<script>
+  // Your web app's Firebase configuration
+  var firebaseConfig = {
+    apiKey: "AIzaSyA4AYxkoxb-y3olmGobEAfzXDAw5mDpwII",
+    authDomain: "dev17-55c30.firebaseapp.com",
+    databaseURL: "https://dev17-55c30.firebaseio.com",
+    projectId: "dev17-55c30",
+    storageBucket: "dev17-55c30.appspot.com",
+    messagingSenderId: "992920030773",
+    appId: "1:992920030773:web:15672ec2377c30daa32b7c"
+  };
+  // Initialize Firebase
+  firebase.initializeApp(firebaseConfig);
+  const ref = firebase.database().ref();//.ref()空はユニークキーを自動で振る。名前入れたらキー名
+
+
+//アイコン処理
+let d=0;
+const img = ["buke.png","tuku.jpg","caram.png"];
+$(".imgs").on("click",function(){
+    d = $(this).attr("data-img");
+    
+})
+
+
+//関数定義：送信処理
+function send(){
+    var h = new Date();
+    var year = h.getFullYear();
+    var month = h.getMonth()+1;
+    var week = h.getDay();
+    var day = h.getDate();
+    var hours = h.getHours();
+    var minutes = h.getMinutes();
+    var t = year + "年"+ month +"月" + day + "日"+ hours + "時" + minutes + "分";
+    console.log(t);
+    const uname = $("#uname").val();
+     const text = $("#text").val();
+     const msg ={
+         uname:uname,
+         text:text,
+         time:t,
+         icon:d
+     };
+     ref.push(msg);//ref = firebase.database().ref()
+     //↑setは決まった名前、pushはユニーク
+};
+
+
+
+ //文字を送信
+ $("#send").on("click",function(){
+     send();
+ });
+
+
+
+
+//受信処理 firebaseの送信を引数dataで受ける
+ref.on("child_added",function(data){
+    const v = data.val();//送信されたオブジェクトを取得
+    const k = data.key;//ユニークキーの取得
+    const str = '<p>'+v.uname+''+v.text+''+v.time+'</p>'; 
+    const icon='<p><img src="imgs/'+img[v.icon]+'"</p>';
+    $("#output").prepend(str);
+    $("#faceicon").prepend(icon);
+    console.log(icon)
+
+
+    //最下部にスクロールする
+    $('#output').each(function(){ 
+       $(this).scrollTop($(this).prop('scrollHeight')); 
+      }); 
+
+
+});
+//「.」は中の、「,」は次がある
+
+
+//イベント情報取得
+$("#text").on("keydown",function(e){
+    console.log(e)
+    if(e.keyCode == 13){
+        send();
+
+        location.reload();
+    }
+ 
+});
+
+
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
